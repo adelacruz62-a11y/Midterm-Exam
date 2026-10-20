@@ -1,0 +1,1546 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Student Scholarship Monitoring and Academic Compliance System</title>
+<style>
+:root{
+  --bg:#f4f6f9; --surface:#ffffff; --surface-2:#eef1f5; --text:#12171f; --muted:#5a6675;
+  --border:#d6dce4; --accent:#1d4ed8; --accent-text:#ffffff; --accent-soft:#e6edfd;
+  --ok:#0f7b3f; --ok-bg:#e4f5ea; --warn:#8a5a00; --warn-bg:#fbf0d9; --bad:#a4262c; --bad-bg:#fbe7e8;
+  --neutral-bg:#e9ecf1; --focus:#0b57d0; --shadow:0 1px 3px rgba(16,24,40,.10);
+  color-scheme: light;
+}
+html[data-theme="dark"]{
+  --bg:#0d1117; --surface:#161b22; --surface-2:#1c232c; --text:#e6edf3; --muted:#9aa7b5;
+  --border:#2c3542; --accent:#7fb0ff; --accent-text:#0d1117; --accent-soft:#17233a;
+  --ok:#5fdc9c; --ok-bg:#0f2a1d; --warn:#f2c66b; --warn-bg:#2c2412; --bad:#ff8f95; --bad-bg:#2e1518;
+  --neutral-bg:#222a35; --focus:#8ab4ff; --shadow:0 1px 3px rgba(0,0,0,.5);
+  color-scheme: dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--text);
+  font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+h1,h2,h3,h4{line-height:1.25;margin:0 0 .4em}
+h1{font-size:1.15rem} h2{font-size:1.22rem} h3{font-size:1rem}
+p{margin:.4em 0}
+a{color:var(--accent)}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px;border-radius:4px}
+.skip{position:absolute;left:-9999px;top:0;background:var(--surface);color:var(--text);padding:.6rem 1rem;z-index:50}
+.skip:focus{left:.5rem;top:.5rem}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.topbar{
+  display:flex;flex-wrap:wrap;gap:1rem;justify-content:space-between;align-items:center;
+  padding:.9rem 1.2rem;background:var(--surface);border-bottom:1px solid var(--border);
+}
+.brand{display:flex;gap:.7rem;align-items:center}
+.logo{font-size:1.5rem;color:var(--accent)}
+.sub{margin:0;color:var(--muted);font-size:.82rem}
+.session{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;font-size:.86rem}
+.session label{color:var(--muted)}
+.notice{
+  margin:0;padding:.6rem 1.2rem;background:var(--warn-bg);color:var(--warn);
+  font-size:.85rem;border-bottom:1px solid var(--border);
+}
+.notice code{font-size:.95em}
+.tabs{display:flex;flex-wrap:wrap;gap:.3rem;padding:.5rem 1rem;background:var(--surface);border-bottom:1px solid var(--border)}
+.tab{
+  appearance:none;border:1px solid transparent;background:transparent;color:var(--muted);
+  padding:.45rem .8rem;border-radius:8px;font:inherit;font-size:.9rem;cursor:pointer;
+}
+.tab:hover{background:var(--surface-2);color:var(--text)}
+.tab[aria-selected="true"]{background:var(--accent-soft);color:var(--accent);border-color:var(--accent);font-weight:600}
+main{padding:1.2rem;max-width:1180px;margin:0 auto}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1rem;margin-bottom:1rem;box-shadow:var(--shadow)}
+.grid{display:grid;gap:.8rem;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));margin-bottom:1rem}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:.85rem 1rem;box-shadow:var(--shadow)}
+.stat .n{font-size:1.9rem;font-weight:700}
+.stat .l{color:var(--muted);font-size:.85rem}
+.stat.ok .n{color:var(--ok)} .stat.bad .n{color:var(--bad)} .stat.warn .n{color:var(--warn)}
+.row{display:flex;flex-wrap:wrap;gap:.6rem;align-items:flex-end}
+.field{display:flex;flex-direction:column;gap:.25rem;min-width:0}
+.field label{font-size:.82rem;color:var(--muted);font-weight:600}
+input[type=text],input[type=search],select,textarea{
+  font:inherit;color:var(--text);background:var(--surface-2);border:1px solid var(--border);
+  border-radius:8px;padding:.5rem .6rem;min-width:0;width:100%;
+}
+textarea{resize:vertical;min-height:4rem}
+input::placeholder{color:var(--muted);opacity:.85}
+button,.btn{
+  appearance:none;font:inherit;cursor:pointer;border-radius:8px;padding:.5rem .85rem;
+  border:1px solid var(--border);background:var(--surface-2);color:var(--text);
+}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:var(--accent-text);font-weight:600}
+.btn-ok{background:var(--ok-bg);border-color:var(--ok);color:var(--ok);font-weight:600}
+.btn-warn{background:var(--warn-bg);border-color:var(--warn);color:var(--warn);font-weight:600}
+.btn-bad{background:var(--bad-bg);border-color:var(--bad);color:var(--bad);font-weight:600}
+button[disabled]{opacity:.5;cursor:not-allowed}
+.btn-sm{padding:.3rem .6rem;font-size:.83rem}
+.table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:.9rem;background:var(--surface)}
+th,td{text-align:left;padding:.55rem .7rem;border-bottom:1px solid var(--border);vertical-align:top}
+th{background:var(--surface-2);font-size:.76rem;text-transform:uppercase;letter-spacing:.03em;color:var(--muted)}
+tr:last-child td{border-bottom:none}
+.badge{display:inline-block;padding:.12rem .5rem;border-radius:999px;font-size:.78rem;font-weight:600;white-space:nowrap;background:var(--neutral-bg);color:var(--text)}
+.badge.ok{background:var(--ok-bg);color:var(--ok)}
+.badge.bad{background:var(--bad-bg);color:var(--bad)}
+.badge.warn{background:var(--warn-bg);color:var(--warn)}
+.badge.acc{background:var(--accent-soft);color:var(--accent)}
+.muted{color:var(--muted)}
+.small{font-size:.85rem}
+.mono{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:.82rem}
+.err{background:var(--bad-bg);color:var(--bad);border:1px solid var(--bad);border-radius:8px;padding:.6rem .7rem;white-space:pre-line;margin:.6rem 0}
+.okbox{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok);border-radius:8px;padding:.6rem .7rem;margin:.6rem 0}
+.warnbox{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn);border-radius:8px;padding:.6rem .7rem;margin:.6rem 0}
+.checks td:nth-child(3){white-space:nowrap;width:1%}
+.pass{color:var(--ok);font-weight:700}
+.fail{color:var(--bad);font-weight:700}
+.deflist{margin:.4rem 0 .2rem;padding-left:1.1rem}
+.deflist li{color:var(--bad);margin:.2rem 0}
+.open-detail{margin-top:.7rem;border-top:1px dashed var(--border);padding-top:.7rem}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:.4rem .9rem;font-size:.88rem;margin:.4rem 0}
+.kv div span{color:var(--muted);display:block;font-size:.74rem;text-transform:uppercase;letter-spacing:.04em}
+.toast{
+  position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);
+  background:var(--surface);border:1px solid var(--border);border-left-width:5px;border-radius:10px;
+  padding:.7rem 1rem;box-shadow:0 6px 20px rgba(0,0,0,.25);max-width:min(92vw,560px);z-index:60;
+  white-space:pre-line;
+}
+.toast.ok{border-left-color:var(--ok)}
+.toast.error{border-left-color:var(--bad);color:var(--bad)}
+.filters{display:flex;flex-wrap:wrap;gap:.6rem;align-items:flex-end;margin-bottom:.8rem}
+.filters .field{flex:1 1 150px}
+.actions{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.7rem}
+.login-wrap{max-width:440px;margin:2.2rem auto}
+.login-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.4rem;box-shadow:var(--shadow)}
+.login-card h2{margin-bottom:.2rem}
+.login-field{margin-top:.8rem}
+.login-field label{display:block;font-size:.82rem;color:var(--muted);font-weight:600;margin-bottom:.25rem}
+.login-submit{width:100%;margin-top:1rem;padding:.65rem}
+.creds{margin-top:1.1rem;border-top:1px dashed var(--border);padding-top:.8rem}
+.creds table{font-size:.84rem}
+.creds .fill{appearance:none;border:0;background:transparent;color:var(--accent);cursor:pointer;font:inherit;font-size:.82rem;text-decoration:underline;padding:0}
+.pw-row{display:flex;gap:.5rem}
+.pw-row input{flex:1}
+footer{padding:1rem 1.2rem;color:var(--muted);font-size:.8rem;text-align:center;border-top:1px solid var(--border)}
+@media (max-width:720px){
+  main{padding:.8rem}
+  .topbar{padding:.7rem .8rem}
+  h1{font-size:1rem}
+  th,td{padding:.45rem .5rem;font-size:.85rem}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<a class="skip" href="#panel">Skip to main content</a>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="logo" aria-hidden="true">&#9670;</span>
+    <div>
+      <h1>Scholarship Monitoring &amp; Academic Compliance System</h1>
+      <p class="sub">Scholarship Office &middot; Merit Scholar &amp; Community Scholar &middot; synthetic data</p>
+    </div>
+  </div>
+  <div class="session">
+    <span class="muted small" id="sessionInfo" hidden>Signed in as <strong id="sessionName"></strong></span>
+    <span class="muted small" id="switchLabel" hidden>Switch account</span>
+    <select id="userSel" aria-label="Demo account selector" hidden></select>
+    <button id="signOutBtn" type="button" hidden>Sign out</button>
+    <button id="themeBtn" type="button" aria-pressed="false">Dark mode</button>
+  </div>
+</header>
+
+<p class="notice" id="demoNotice">
+  <strong>Demo build:</strong> data lives in this browser&rsquo;s <code>localStorage</code>. The role checks run in one
+  JavaScript API layer so the rules cannot be bypassed by hiding buttons, but that is <strong>not real security</strong>.
+  The production design places the same rules in Supabase row-level security &mdash; see <code>supabase/schema.sql</code>.
+</p>
+
+<nav class="tabs" id="tabs" role="tablist" aria-label="Application sections"></nav>
+<main id="panel" tabindex="-1"></main>
+<footer>Registrar remains the official source of grades. This system verifies evidence and records decisions; it never alters grades and never releases payments.</footer>
+
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+<script id="app-core">
+"use strict";
+/* ---------- helpers ---------- */
+function AppError(message){ this.name="AppError"; this.message=message; }
+AppError.prototype=Object.create(Error.prototype);
+AppError.prototype.constructor=AppError;
+
+function p2(n){ return n<10?"0"+n:""+n; }
+
+function esc(v){
+  return String(v===null||v===undefined?"":v)
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+}
+
+/* Asia/Manila is UTC+8 with no daylight saving. Instants are stored as
+   ISO-8601 with an explicit +08:00 offset so the wall clock never shifts. */
+function toManilaISO(date){
+  var d=new Date(date.getTime()+(8*60+date.getTimezoneOffset())*60000);
+  return d.getFullYear()+"-"+p2(d.getMonth()+1)+"-"+p2(d.getDate())+"T"+
+         p2(d.getHours())+":"+p2(d.getMinutes())+":"+p2(d.getSeconds())+"+08:00";
+}
+function nowManilaISO(){ return toManilaISO(new Date()); }
+function addHoursISO(iso,hours){ return toManilaISO(new Date(new Date(iso).getTime()+hours*3600000)); }
+
+/* Display the stored wall clock without converting it. */
+function manilaStamp(iso){
+  var m=/^(\d{4}-\d{2}-\d{2})[T ](\d{2}:\d{2})(?::\d{2})?/.exec(iso||"");
+  return m?(m[1]+" "+m[2]+" Asia/Manila"):(iso||"—");
+}
+function gwaText(n){ return Number(n).toFixed(2); }
+
+/* ---------- stored policy records: evaluation never hardcodes thresholds ---------- */
+var DEADLINE_ISO="2026-10-30T17:00:00+08:00";
+var ON_TIME_ISO="2026-10-29T17:00:00+08:00";
+var TERM_YEAR="2026-2027";
+var TERM_SEM=1;
+
+function policyRecords(){
+  return [
+    {code:"MERIT",name:"Merit Scholar",maxGwa:1.75,minUnits:18,maxFailed:0,maxIncomplete:0,maxDropped:0,
+     evidenceRequired:true,deadline:DEADLINE_ISO},
+    {code:"COMMUNITY",name:"Community Scholar",maxGwa:2.25,minUnits:15,maxFailed:0,maxIncomplete:0,maxDropped:1,
+     evidenceRequired:true,deadline:DEADLINE_ISO}
+  ];
+}
+function userRecords(scholars){
+  var users=[{id:"staff-01",role:"staff",name:"R. Alvarez",scholarId:"",password:"staff123",
+    label:"Scholarship Staff \u2014 R. Alvarez"}];
+  scholars.forEach(function(s){
+    users.push({id:s.id,role:"scholar",name:s.name,scholarId:s.id,password:"scholar123",
+      label:"Scholar "+s.id+" \u2014 "+s.name});
+  });
+  return users;
+}
+/* Earlier builds persisted the stored users without a password field, and that
+   saved database is reused on every load. The demo passwords printed on the
+   login form are therefore restored onto the stored accounts before any sign
+   in attempt is checked. */
+function reconcileDemoUsers(db){
+  if(!db||!Array.isArray(db.users)||!Array.isArray(db.scholars)) return seedDb();
+  var byId={};
+  db.users.forEach(function(u){ byId[String(u.id).toLowerCase()]=u; });
+  userRecords(db.scholars).forEach(function(canon){
+    var u=byId[String(canon.id).toLowerCase()];
+    if(!u){ db.users.push(canon); return; }
+    u.password=canon.password;
+  });
+  db.users.forEach(function(u){
+    if(typeof u.password!=="string"||!u.password)
+      u.password=u.role==="staff"?"staff123":"scholar123";
+  });
+  return db;
+}
+function snapshotPolicy(p){
+  return {code:p.code,name:p.name,maxGwa:p.maxGwa,minUnits:p.minUnits,maxFailed:p.maxFailed,
+          maxIncomplete:p.maxIncomplete,maxDropped:p.maxDropped,
+          evidenceRequired:p.evidenceRequired,deadline:p.deadline};
+}
+function programName(programs,code){
+  var p=programs.filter(function(x){return x.code===code;})[0];
+  return p?p.name:code;
+}
+
+/* ---------- policy evaluation ---------- */
+function computeChecks(sub,program,statusOverride){
+  var status=statusOverride||sub.status;
+  var checks=[];
+  var verified=status==="Verified";
+  checks.push({
+    label:"Submission verified by scholarship staff",
+    passed:verified,
+    detail:verified?"Verified by scholarship staff."
+      :"Not verified yet \u2014 the record status is "+status+". Evaluation is blocked."
+  });
+  if(program.evidenceRequired){
+    var has=!!(sub.evidenceRef&&String(sub.evidenceRef).trim());
+    checks.push({
+      label:"Grade document evidence attached",
+      passed:has,
+      detail:has?"Evidence reference: "+sub.evidenceRef
+        :"No grade-document reference was provided. The "+program.name+" policy requires one, so evaluation is blocked."
+    });
+  }
+  var gwaOk=Number(sub.gwa)<=Number(program.maxGwa);
+  checks.push({label:"GWA within the policy maximum",passed:gwaOk,
+    detail:gwaOk?("GWA "+gwaText(sub.gwa)+" is within the "+program.name+" maximum of "+gwaText(program.maxGwa)+".")
+      :("GWA "+gwaText(sub.gwa)+" exceeds the "+program.name+" maximum of "+gwaText(program.maxGwa)+".")});
+  var unitsOk=Number(sub.enrolledUnits)>=Number(program.minUnits);
+  checks.push({label:"Enrolled units meet the minimum",passed:unitsOk,
+    detail:unitsOk?("Enrolled units "+sub.enrolledUnits+" meet the "+program.name+" minimum of "+program.minUnits+".")
+      :("Enrolled units "+sub.enrolledUnits+" are below the "+program.name+" minimum of "+program.minUnits+".")});
+  var failedOk=Number(sub.failed)<=Number(program.maxFailed);
+  checks.push({label:"Failed grades within the limit",passed:failedOk,
+    detail:failedOk?("Failed grades "+sub.failed+" are within the limit of "+program.maxFailed+".")
+      :("Failed grades "+sub.failed+" exceed the "+program.name+" limit of "+program.maxFailed+".")});
+  var incOk=Number(sub.incomplete)<=Number(program.maxIncomplete);
+  checks.push({label:"Incomplete grades within the limit",passed:incOk,
+    detail:incOk?("Incomplete grades "+sub.incomplete+" are within the limit of "+program.maxIncomplete+".")
+      :("Incomplete grades "+sub.incomplete+" exceed the "+program.name+" limit of "+program.maxIncomplete+".")});
+  var dropOk=Number(sub.dropped)<=Number(program.maxDropped);
+  checks.push({label:"Dropped grades within the limit",passed:dropOk,
+    detail:dropOk?("Dropped grades "+sub.dropped+" are within the limit of "+program.maxDropped+".")
+      :("Dropped grades "+sub.dropped+" exceed the "+program.name+" limit of "+program.maxDropped+".")});
+  var late=new Date(sub.submittedAt).getTime()>new Date(program.deadline).getTime();
+  var lateDetail;
+  if(late){
+    var mins=Math.round((new Date(sub.submittedAt).getTime()-new Date(program.deadline).getTime())/60000);
+    var amount=mins<60?(mins+" minute"+(mins===1?"":"s")
+      ):(mins<1440?(Math.round(mins/60)+" hour(s)"
+      ):(Math.round(mins/1440)+" day(s)"));
+    lateDetail="Submitted "+amount+" after the deadline ("+manilaStamp(program.deadline)+").";
+  }else{
+    lateDetail="Submitted "+manilaStamp(sub.submittedAt)+"; deadline "+manilaStamp(program.deadline)+".";
+  }
+  checks.push({label:"Submitted on or before the deadline",passed:!late,detail:lateDetail});
+  return checks;
+}
+
+/* ---------- input validation: plain-language messages ---------- */
+function validateSubmissionPayload(p){
+  var errors=[];
+  var year=String(p.academicYear===null||p.academicYear===undefined?"":p.academicYear).trim();
+  if(!/^\d{4}-\d{4}$/.test(year)) errors.push("Academic year must look like 2026-2027.");
+  var sem=Number(p.semester);
+  if(sem!==1&&sem!==2) errors.push("Semester must be 1 or 2.");
+  var gwaRaw=String(p.gwa===null||p.gwa===undefined?"":p.gwa).trim();
+  if(gwaRaw===""||!isFinite(Number(gwaRaw))){
+    errors.push("GWA must be a number between 1.00 and 5.00. 1.00 is the best grade and 5.00 is failing.");
+  }else if(Number(gwaRaw)<1||Number(gwaRaw)>5){
+    errors.push("GWA must be between 1.00 and 5.00. 1.00 is the best grade and 5.00 is failing.");
+  }
+  [["enrolledUnits","Enrolled units"],["failed","Failed grades"],
+   ["incomplete","Incomplete grades"],["dropped","Dropped grades"]].forEach(function(pair){
+    var raw=String(p[pair[0]]===null||p[pair[0]]===undefined?"":p[pair[0]]).trim();
+    if(!/^\d+$/.test(raw)) errors.push(pair[1]+" must be a whole number of 0 or more.");
+  });
+  if(!String(p.evidenceRef||"").trim()){
+    errors.push("A grade-document reference (evidence) is required. Example: GWA-A01-2026-1.pdf");
+  }
+  return errors;
+}
+/* ---------- seed data (AY 2026-2027, Semester 1) ---------- */
+function seedDb(){
+  var programs=policyRecords();
+  var scholars=[
+    {id:"A01",name:"Elena Cruz",programCode:"MERIT",registeredAt:"2026-08-15T09:00:00+08:00"},
+    {id:"A02",name:"Marco Villanueva",programCode:"MERIT",registeredAt:"2026-08-15T09:05:00+08:00"},
+    {id:"A03",name:"Jasmin Reyes",programCode:"COMMUNITY",registeredAt:"2026-08-15T09:10:00+08:00"},
+    {id:"A04",name:"Paolo Santos",programCode:"COMMUNITY",registeredAt:"2026-08-15T09:15:00+08:00"},
+    {id:"A05",name:"Andrea Lim",programCode:"MERIT",registeredAt:"2026-08-15T09:20:00+08:00"},
+    {id:"A06",name:"Noel Bautista",programCode:"COMMUNITY",registeredAt:"2026-08-15T09:25:00+08:00"},
+    {id:"A07",name:"Kim Torres",programCode:"MERIT",registeredAt:"2026-08-15T09:30:00+08:00"},
+    {id:"A08",name:"Rhea Mendoza",programCode:"COMMUNITY",registeredAt:"2026-08-15T09:35:00+08:00"},
+    {id:"A09",name:"Luis Garcia",programCode:"MERIT",registeredAt:"2026-08-15T09:40:00+08:00"},
+    {id:"A10",name:"Mika Dela Cruz",programCode:"COMMUNITY",registeredAt:"2026-08-15T09:45:00+08:00"},
+    {id:"A11",name:"Franco Reyes",programCode:"MERIT",registeredAt:"2026-08-15T09:50:00+08:00"},
+    {id:"A12",name:"Shara Aquino",programCode:"COMMUNITY",registeredAt:"2026-08-15T09:55:00+08:00"}
+  ];
+  function sub(sid,scholarId,gwa,units,f,i,d,at,status,evidence){
+    return {id:sid,scholarId:scholarId,academicYear:TERM_YEAR,semester:TERM_SEM,
+      gwa:gwa,enrolledUnits:units,failed:f,incomplete:i,dropped:d,
+      evidenceRef:evidence,submittedAt:at,status:status,returnReason:"",verificationNote:"",
+      verificationAt:status==="Verified"?addHoursISO(at,1):""};
+  }
+  var submissions=[
+    sub("S01","A01",1.75,18,0,0,0,DEADLINE_ISO,"Verified","GWA-A01-2026-1.pdf"),
+    sub("S02","A02",1.76,18,0,0,0,ON_TIME_ISO,"Verified","GWA-A02-2026-1.pdf"),
+    sub("S03","A03",2.25,15,0,0,1,ON_TIME_ISO,"Verified","GWA-A03-2026-1.pdf"),
+    sub("S04","A04",2.25,14,0,1,0,ON_TIME_ISO,"Verified","GWA-A04-2026-1.pdf"),
+    sub("S05","A05",1.50,18,1,0,0,"2026-10-30T17:01:00+08:00","Verified","GWA-A05-2026-1.pdf"),
+    sub("S06","A06",2.00,15,0,0,0,ON_TIME_ISO,"Pending","GWA-A06-2026-1.pdf"),
+    sub("S07","A07",1.40,21,0,0,0,ON_TIME_ISO,"Verified","GWA-A07-2026-1.pdf"),
+    sub("S08","A08",2.10,16,0,0,0,ON_TIME_ISO,"Verified","GWA-A08-2026-1.pdf"),
+    sub("S09","A09",1.60,18,0,0,0,ON_TIME_ISO,"Verified","GWA-A09-2026-1.pdf"),
+    sub("S10","A10",2.20,16,0,0,0,ON_TIME_ISO,"Verified","GWA-A10-2026-1.pdf"),
+    sub("S11","A11",2.00,18,0,0,0,ON_TIME_ISO,"Verified","GWA-A11-2026-1.pdf"),
+    sub("S12","A12",2.10,15,0,0,2,ON_TIME_ISO,"Verified","GWA-A12-2026-1.pdf")
+  ];
+  var db={programs:programs,scholars:scholars,users:userRecords(scholars),
+          submissions:submissions,evaluations:[],decisions:[],history:[]};
+
+  function programOf(scholarId){
+    var sch=scholars.filter(function(x){return x.id===scholarId;})[0];
+    return programs.filter(function(p){return p.code===sch.programCode;})[0];
+  }
+
+  ["S01","S02","S03","S04","S05","S07","S08","S09","S10","S11","S12"].forEach(function(sid,i){
+    var s=submissions.filter(function(x){return x.id===sid;})[0];
+    var p=programOf(s.scholarId);
+    var checks=computeChecks(s,p);
+    var def=checks.filter(function(c){return !c.passed;}).map(function(c){return c.detail;});
+    db.evaluations.push({id:"E"+p2(i+1),submissionId:sid,programCode:p.code,
+      result:def.length?"With Deficiency":"Compliant",deficiencies:def,checks:checks,
+      policySnapshot:snapshotPolicy(p),evaluatedAt:addHoursISO(s.submittedAt,2),evaluatedBy:"staff-01"});
+  });
+  var decisionMap={S01:"Approved",S02:"Held",S03:"Approved",S04:"Held",S05:"Held",
+                   S07:"Approved",S08:"Approved",S11:"Held",S12:"Held"};
+  Object.keys(decisionMap).forEach(function(sid,i){
+    var s=submissions.filter(function(x){return x.id===sid;})[0];
+    db.decisions.push({id:"D"+p2(i+1),submissionId:sid,decision:decisionMap[sid],
+      decidedAt:addHoursISO(s.submittedAt,3),decidedBy:"staff-01",note:""});
+  });
+
+  var hid=1;
+  function log(at,actor,actorRole,event,notes,submissionId,scholarId){
+    db.history.push({id:"H"+p2(hid++),at:at,actor:actor,actorRole:actorRole,event:event,
+      notes:notes||"",submissionId:submissionId||"",scholarId:scholarId||""});
+  }
+  scholars.forEach(function(s){
+    log(s.registeredAt,"R. Alvarez","staff","Scholar registered",
+        "Registered "+s.name+" and assigned the "+programName(programs,s.programCode)+" policy.","",s.id);
+  });
+  submissions.forEach(function(s){
+    var sch=scholars.filter(function(x){return x.id===s.scholarId;})[0];
+    log(s.submittedAt,sch.name,"scholar","Grades submitted",
+        "AY "+s.academicYear+" Semester "+s.semester+", GWA "+gwaText(s.gwa)+
+        ", "+s.enrolledUnits+" units, evidence "+s.evidenceRef+".",s.id,s.scholarId);
+    if(s.status==="Verified"){
+      log(s.verificationAt,"R. Alvarez","staff","Submission verified",
+          "Evidence checked against the Registrar record.",s.id,s.scholarId);
+    }
+  });
+  db.evaluations.forEach(function(e){
+    var s=submissions.filter(function(x){return x.id===e.submissionId;})[0];
+    log(e.evaluatedAt,"R. Alvarez","staff","Compliance evaluated",
+        e.result+(e.deficiencies.length?(" \u2014 "+e.deficiencies.join(" | ")):" \u2014 all policy checks passed."),
+        s.id,s.scholarId);
+  });
+  db.decisions.forEach(function(d){
+    var s=submissions.filter(function(x){return x.id===d.submissionId;})[0];
+    log(d.decidedAt,"R. Alvarez","staff","Renewal decision recorded","Decision: "+d.decision+".",s.id,s.scholarId);
+  });
+  db.history.sort(function(a,b){return new Date(a.at)-new Date(b.at);});
+  return db;
+}
+/* ============================================================
+   API layer. Every read and write in the UI goes through this
+   object. Role and ownership are enforced here in code, never by
+   hiding buttons. supabase/schema.sql mirrors these rules as RLS.
+   ============================================================ */
+function makeApi(db,holder,onChange){
+  var emit=function(){ if(onChange) onChange(); };
+
+  function requireAuth(){
+    if(!holder.current) throw new AppError("Sign in first to continue.");
+    return holder.current;
+  }
+  function requireRole(role){
+    var s=requireAuth();
+    if(s.role!==role){
+      throw new AppError(role==="staff"
+        ?"Only scholarship staff can do this. The account you are signed in as does not have that permission."
+        :"Only scholars can do this. The account you are signed in as does not have that permission.");
+    }
+    return s;
+  }
+  function requireOwner(sub){
+    var s=requireAuth();
+    if(s.role==="staff") return s;
+    if(s.scholarId!==sub.scholarId) throw new AppError("You can only open your own scholarship records.");
+    return s;
+  }
+  function getProgram(code){
+    var p=db.programs.filter(function(x){return x.code===code;})[0];
+    if(!p) throw new AppError("No scholarship policy is assigned to this scholar yet.");
+    return p;
+  }
+  function getSubOrThrow(id){
+    var sub=db.submissions.filter(function(x){return x.id===id;})[0];
+    if(!sub) throw new AppError("That submission record does not exist.");
+    return sub;
+  }
+  function getScholarOrThrow(id){
+    var s=db.scholars.filter(function(x){return x.id===id;})[0];
+    if(!s) throw new AppError("That scholar is not registered.");
+    return s;
+  }
+  function evaluationOf(id){ return db.evaluations.filter(function(x){return x.submissionId===id;})[0]||null; }
+  function decisionOf(id){ return db.decisions.filter(function(x){return x.submissionId===id;})[0]||null; }
+  function nextId(prefix,list){
+    var n=list.length+1,id;
+    do{ id=prefix+p2(n); n++; }while(list.some(function(x){return x.id===id;}));
+    return id;
+  }
+  function log(actor,event,notes,sub,forceScholarId){
+    db.history.push({id:nextId("H",db.history),at:nowManilaISO(),actor:actor.name,actorRole:actor.role,
+      event:event,notes:notes||"",submissionId:sub?sub.id:"",
+      scholarId:sub?sub.scholarId:(forceScholarId||actor.scholarId||"")});
+  }
+  function decorate(sub){
+    var sch=getScholarOrThrow(sub.scholarId);
+    var program=getProgram(sch.programCode);
+    var ev=evaluationOf(sub.id);
+    var dec=decisionOf(sub.id);
+    return {submission:sub,scholar:sch,program:program,checks:computeChecks(sub,program),
+      evaluation:ev,decision:dec,compliance:ev?ev.result:"Not evaluated",decisionText:dec?dec.decision:"Not decided"};
+  }
+
+  return {
+
+    signIn:function(userId){
+      var u=db.users.filter(function(x){return x.id===userId;})[0];
+      if(!u) throw new AppError("That demo account does not exist.");
+      holder.current=u; emit(); return u;
+    },
+    /* Demo credential check. Passwords are stored in clear text on purpose so the
+       synthetic accounts are easy to try; the production path uses Supabase Auth. */
+    login:function(username,password){
+      var name=String(username||"").trim().toLowerCase();
+      var pass=String(password||"");
+      var u=db.users.filter(function(x){ return x.id.toLowerCase()===name; })[0];
+      if(!u){
+        throw new AppError("No account matches that username. Use a scholar ID such as A01, or staff-01.");
+      }
+      if(u.password!==pass){
+        throw new AppError("That password is not correct. Demo passwords are listed on the login form.");
+      }
+      holder.current=u; emit(); return u;
+    },
+    signOut:function(){ holder.current=null; emit(); },
+    getSession:function(){ return holder.current; },
+    listUsers:function(){ return db.users.slice(); },
+    listPrograms:function(){ return db.programs.slice(); },
+
+    /* ---- scholars (staff) ---- */
+    listScholars:function(){ requireRole("staff"); return db.scholars.slice(); },
+    registerScholar:function(payload){
+      var staff=requireRole("staff");
+      var id=String(payload.id||"").trim().toUpperCase();
+      var name=String(payload.name||"").trim();
+      var programCode=String(payload.programCode||"").trim();
+      var errors=[];
+      if(!/^[A-Z]\d{2}$/.test(id)) errors.push("Scholar ID must be one letter followed by two digits, for example A13.");
+      if(!name) errors.push("Full name is required.");
+      if(!db.programs.some(function(p){return p.code===programCode;}))
+        errors.push("Choose one of the stored scholarship policies.");
+      if(errors.length) throw new AppError(errors.join("\n"));
+      if(db.scholars.some(function(s){return s.id===id;}))
+        throw new AppError("Scholar ID "+id+" is already registered. Use a different ID.");
+      var scholar={id:id,name:name,programCode:programCode,registeredAt:nowManilaISO()};
+      db.scholars.push(scholar);
+      db.users.push({id:id,role:"scholar",name:name,scholarId:id,password:"scholar123",label:"Scholar "+id+" \u2014 "+name});
+      log(staff,"Scholar registered",
+          "Registered "+name+" and assigned the "+getProgram(programCode).name+" policy.",null,id);
+      emit(); return scholar;
+    },
+
+    /* ---- grade submission (scholar) ---- */
+    submitGrades:function(payload){
+      var s=requireRole("scholar");
+      var errors=validateSubmissionPayload(payload);
+      if(errors.length) throw new AppError(errors.join("\n"));
+      var year=String(payload.academicYear).trim();
+      var sem=Number(payload.semester);
+      var exists=db.submissions.filter(function(x){
+        return x.scholarId===s.scholarId&&x.academicYear===year&&x.semester===sem;})[0];
+      if(exists){
+        throw new AppError("You already submitted a record for AY "+year+" Semester "+sem+
+          ". Only one record per scholar, academic year and semester is allowed."+
+          (exists.status==="Returned"?" Open that record to correct and resubmit it.":""));
+      }
+      var sub={id:nextId("S",db.submissions),scholarId:s.scholarId,academicYear:year,semester:sem,
+        gwa:Number(payload.gwa),enrolledUnits:Number(payload.enrolledUnits),
+        failed:Number(payload.failed),incomplete:Number(payload.incomplete),dropped:Number(payload.dropped),
+        evidenceRef:String(payload.evidenceRef).trim(),submittedAt:nowManilaISO(),
+        status:"Pending",returnReason:"",verificationNote:"",verificationAt:""};
+      db.submissions.push(sub);
+      log(s,"Grades submitted",
+          "AY "+year+" Semester "+sem+", GWA "+gwaText(sub.gwa)+", "+sub.enrolledUnits+
+          " units, evidence "+sub.evidenceRef+".",sub);
+      emit(); return sub;
+    },
+    resubmit:function(submissionId,payload){
+      var s=requireRole("scholar");
+      var sub=getSubOrThrow(submissionId);
+      requireOwner(sub);
+      if(sub.status!=="Returned")
+        throw new AppError("Only a record that was returned for correction can be resubmitted. This record is "+sub.status+".");
+      var errors=validateSubmissionPayload(payload);
+      if(errors.length) throw new AppError(errors.join("\n"));
+      sub.academicYear=String(payload.academicYear).trim();
+      sub.semester=Number(payload.semester);
+      sub.gwa=Number(payload.gwa);
+      sub.enrolledUnits=Number(payload.enrolledUnits);
+      sub.failed=Number(payload.failed);
+      sub.incomplete=Number(payload.incomplete);
+      sub.dropped=Number(payload.dropped);
+      sub.evidenceRef=String(payload.evidenceRef).trim();
+      sub.submittedAt=nowManilaISO();
+      sub.status="Pending";
+      sub.returnReason="";
+      sub.verificationNote="";
+      sub.verificationAt="";
+      db.evaluations=db.evaluations.filter(function(e){return e.submissionId!==sub.id;});
+      db.decisions=db.decisions.filter(function(d){return d.submissionId!==sub.id;});
+      log(s,"Submission resubmitted","Corrected after return. The record is pending verification again.",sub);
+      emit(); return sub;
+    },
+
+    /* ---- verification (staff) ---- */
+    verify:function(submissionId,action){
+      var staff=requireRole("staff");
+      var sub=getSubOrThrow(submissionId);
+      if(sub.status!=="Pending")
+        throw new AppError("Only records that are pending verification can be actioned. This record is "+sub.status+".");
+      if(action.decision==="Verified"){
+        sub.status="Verified";
+        sub.returnReason="";
+        sub.verificationNote=String(action.note||"").trim();
+        sub.verificationAt=nowManilaISO();
+        log(staff,"Submission verified",sub.verificationNote||"Evidence checked against the Registrar record.",sub);
+      }else if(action.decision==="Returned"){
+        var reason=String(action.reason||"").trim();
+        if(!reason) throw new AppError("A reason is required when you return a record so the scholar knows what to fix.");
+        sub.status="Returned";
+        sub.returnReason=reason;
+        sub.verificationAt=nowManilaISO();
+        log(staff,"Submission returned",reason,sub);
+      }else{
+        throw new AppError("Choose Verified or Returned.");
+      }
+      emit(); return sub;
+    },
+
+    /* ---- evaluation (staff) ---- */
+    previewChecks:function(submissionId){
+      var sub=getSubOrThrow(submissionId);
+      requireOwner(sub);
+      var program=getProgram(getScholarOrThrow(sub.scholarId).programCode);
+      return {submission:sub,program:program,checks:computeChecks(sub,program)};
+    },
+    evaluate:function(submissionId){
+      var staff=requireRole("staff");
+      var sub=getSubOrThrow(submissionId);
+      var program=getProgram(getScholarOrThrow(sub.scholarId).programCode);
+      if(sub.status!=="Verified"){
+        throw new AppError("Compliance can only be evaluated on a verified record. This record is "+sub.status+
+          (sub.status==="Returned"?" \u2014 ask the scholar to correct it, then verify it first.":" \u2014 verify it first."));
+      }
+      if(program.evidenceRequired&&!String(sub.evidenceRef||"").trim()){
+        throw new AppError("Evaluation is blocked: the "+program.name+
+          " policy requires a grade-document reference and none is recorded.");
+      }
+      var checks=computeChecks(sub,program);
+      var deficiencies=checks.filter(function(c){return !c.passed;}).map(function(c){return c.detail;});
+      var result=deficiencies.length?"With Deficiency":"Compliant";
+      var existing=evaluationOf(sub.id);
+      var evaluation={id:existing?existing.id:nextId("E",db.evaluations),submissionId:sub.id,programCode:program.code,
+        result:result,deficiencies:deficiencies,checks:checks,policySnapshot:snapshotPolicy(program),
+        evaluatedAt:nowManilaISO(),evaluatedBy:staff.id};
+      if(existing) db.evaluations[db.evaluations.indexOf(existing)]=evaluation;
+      else db.evaluations.push(evaluation);
+      log(staff,"Compliance evaluated",
+          result+(deficiencies.length?(" \u2014 "+deficiencies.join(" | ")):" \u2014 all policy checks passed."),sub);
+      emit(); return evaluation;
+    },
+
+    /* ---- renewal decision (staff) ---- */
+    decide:function(submissionId,decision,note){
+      var staff=requireRole("staff");
+      var sub=getSubOrThrow(submissionId);
+      if(decision!=="Approved"&&decision!=="Held")
+        throw new AppError("A renewal decision must be Approved or Held.");
+      var evaluation=evaluationOf(sub.id);
+      if(!evaluation)
+        throw new AppError("Run the compliance evaluation first. A renewal decision cannot be recorded without a compliance result.");
+      if(decision==="Approved"&&evaluation.result!=="Compliant"){
+        throw new AppError("Only a compliant record can be approved. This record is With Deficiency:\n- "+
+          evaluation.deficiencies.join("\n- "));
+      }
+      var existing=decisionOf(sub.id);
+      var record={id:existing?existing.id:nextId("D",db.decisions),submissionId:sub.id,decision:decision,
+        decidedAt:nowManilaISO(),decidedBy:staff.id,note:String(note||"").trim()};
+      if(existing) db.decisions[db.decisions.indexOf(existing)]=record;
+      else db.decisions.push(record);
+      log(staff,"Renewal decision recorded","Decision: "+decision+"."+(record.note?(" Note: "+record.note):""),sub);
+      emit(); return record;
+    },
+
+    /* ---- reads ---- */
+    getMyScholar:function(){
+      var s=requireRole("scholar");
+      return getScholarOrThrow(s.scholarId);
+    },
+    listSubmissions:function(){
+      var s=requireAuth();
+      var list=s.role==="staff"?db.submissions.slice()
+        :db.submissions.filter(function(x){return x.scholarId===s.scholarId;});
+      return list.map(decorate);
+    },
+    getSubmission:function(id){
+      var sub=getSubOrThrow(id);
+      requireOwner(sub);
+      return decorate(sub);
+    },
+    listHistory:function(){
+      var s=requireAuth();
+      var list=s.role==="staff"?db.history.slice()
+        :db.history.filter(function(h){return h.scholarId===s.scholarId;});
+      return list.slice().sort(function(a,b){return new Date(b.at)-new Date(a.at);});
+    },
+    getDashboard:function(query){
+      requireRole("staff");
+      var year=(query&&query.year)||TERM_YEAR;
+      var sem=Number((query&&query.semester)||TERM_SEM);
+      var q=String((query&&query.q)||"").trim().toLowerCase();
+      var prog=(query&&query.program)||"";
+      var comp=(query&&query.compliance)||"";
+      var rows=db.scholars.map(function(sch){
+        var sub=db.submissions.filter(function(x){
+          return x.scholarId===sch.id&&x.academicYear===year&&x.semester===sem;})[0]||null;
+        var ev=sub?evaluationOf(sub.id):null;
+        var dec=sub?decisionOf(sub.id):null;
+        return {scholar:sch,submission:sub,evaluation:ev,decision:dec,
+          status:sub?sub.status:"Not submitted",compliance:ev?ev.result:"Not evaluated",
+          decisionText:dec?dec.decision:"Not decided"};
+      });
+      var filtered=rows.filter(function(r){
+        if(q&&r.scholar.id.toLowerCase().indexOf(q)===-1&&r.scholar.name.toLowerCase().indexOf(q)===-1) return false;
+        if(prog&&r.scholar.programCode!==prog) return false;
+        if(comp&&r.compliance!==comp) return false;
+        return true;
+      });
+      return {year:year,semester:sem,assigned:rows.length,
+        pending:rows.filter(function(r){return r.status==="Pending";}).length,
+        compliant:rows.filter(function(r){return r.compliance==="Compliant";}).length,
+        deficient:rows.filter(function(r){return r.compliance==="With Deficiency";}).length,
+        rows:filtered};
+    },
+    runTests:function(){ return runTests(); }
+  };
+}
+/* ============================================================
+   In-app test runner. Each run works on a fresh copy of the seed
+   data so the demo records are never modified by the tests.
+   ============================================================ */
+function runTests(){
+  var out=[];
+  var db=seedDb();
+  var holder={current:null};
+  var api=makeApi(db,holder,function(){});
+
+  function messageOf(fn){ try{ fn(); return ""; }catch(e){ return e.message; } }
+  function getSub(id){ return db.submissions.filter(function(x){return x.id===id;})[0]; }
+  function getEval(id){ return db.evaluations.filter(function(x){return x.submissionId===id;})[0]; }
+  function getDec(id){ return db.decisions.filter(function(x){return x.submissionId===id;})[0]; }
+  function defs(id){ var e=getEval(id); return e?e.deficiencies:[]; }
+
+  function attempt(id,desc,expectLabel,fn,test){
+    var actual,pass;
+    try{
+      actual=fn();
+      pass=test?!!test(actual):(String(actual)===String(expectLabel));
+    }catch(e){
+      actual="Unexpected error: "+e.message;
+      pass=false;
+    }
+    out.push({id:id,desc:desc,expect:expectLabel,actual:String(actual),pass:pass});
+  }
+
+  api.signIn("staff-01");
+
+  attempt("TC01","A01 (Merit, GWA 1.75 / 18 units, submitted at the exact deadline) evaluates as Compliant",
+    "Compliant, 0 deficiencies",
+    function(){ api.evaluate("S01"); var e=getEval("S01"); return e.result+", "+e.deficiencies.length+" deficiencies"; },
+    function(a){ return a==="Compliant, 0 deficiencies"; });
+
+  attempt("TC02","A02 (GWA 1.76 against the Merit maximum of 1.75) is With Deficiency for GWA only",
+    "With Deficiency with the GWA reason",
+    function(){ api.evaluate("S02"); var d=defs("S02"); return getEval("S02").result+": "+d.join(" | "); },
+    function(){ var d=defs("S02"); return getEval("S02").result==="With Deficiency"&&d.length===1&&/GWA 1\.76 exceeds the .+ maximum of 1\.75/.test(d[0]||""); });
+
+  attempt("TC03","A03 (Community, GWA 2.25 / 15 units / 1 dropped) evaluates as Compliant",
+    "Compliant, 0 deficiencies",
+    function(){ api.evaluate("S03"); var e=getEval("S03"); return e.result+", "+e.deficiencies.length+" deficiencies"; },
+    function(a){ return a==="Compliant, 0 deficiencies"; });
+
+  attempt("TC04","A04 (14 units, 1 incomplete) reports the units and incomplete deficiencies",
+    "2 reasons: units below 15 and incomplete above 0",
+    function(){ api.evaluate("S04"); return defs("S04").length+" reasons: "+defs("S04").join(" | "); },
+    function(){ var d=defs("S04"); var j=d.join(" | ");
+      return d.length===2&&/Enrolled units 14 are below the .+ minimum of 15/.test(j)&&/Incomplete grades 1 exceed/.test(j); });
+
+  attempt("TC05","A05 (1 failed grade, submitted one minute late) reports the failed and late deficiencies",
+    "2 reasons: failed above 0 and submitted after the deadline",
+    function(){ api.evaluate("S05"); return defs("S05").length+" reasons: "+defs("S05").join(" | "); },
+    function(){ var d=defs("S05"); var j=d.join(" | ");
+      return d.length===2&&/Failed grades 1 exceed/.test(j)&&/1 minute after the deadline/.test(j); });
+
+  attempt("TC06","A06 is only Pending verification, so evaluation and approval are both blocked",
+    "evaluate blocked; approve blocked",
+    function(){
+      var a=messageOf(function(){ api.evaluate("S06"); })?"blocked":"ALLOWED";
+      var b=messageOf(function(){ api.decide("S06","Approved"); })?"blocked":"ALLOWED";
+      return "evaluate "+a+"; approve "+b;
+    },
+    function(a){ return a==="evaluate blocked; approve blocked"; });
+
+  attempt("TC07","Duplicate record, GWA 0.50 and a negative count are all rejected",
+    "3 of 3 rejected",
+    function(){
+      api.signIn("A01");
+      var rejected=0;
+      if(messageOf(function(){ api.submitGrades({academicYear:TERM_YEAR,semester:1,gwa:"1.50",enrolledUnits:"18",failed:"0",incomplete:"0",dropped:"0",evidenceRef:"x.pdf"}); })) rejected++;
+      var gwa=messageOf(function(){ api.submitGrades({academicYear:TERM_YEAR,semester:2,gwa:"0.50",enrolledUnits:"18",failed:"0",incomplete:"0",dropped:"0",evidenceRef:"x.pdf"}); });
+      if(/between 1\.00 and 5\.00/.test(gwa)) rejected++;
+      var neg=messageOf(function(){ api.submitGrades({academicYear:TERM_YEAR,semester:2,gwa:"1.50",enrolledUnits:"18",failed:"-1",incomplete:"0",dropped:"0",evidenceRef:"x.pdf"}); });
+      if(/whole number of 0 or more/.test(neg)) rejected++;
+      api.signIn("staff-01");
+      return rejected+" of 3 rejected";
+    },
+    function(a){ return a==="3 of 3 rejected"; });
+
+  attempt("TC08","Scholar A01 cannot read A02's record and cannot verify a submission",
+    "read blocked; verify blocked",
+    function(){
+      api.signIn("A01");
+      var read=messageOf(function(){ api.getSubmission("S02"); })?"blocked":"ALLOWED";
+      var verify=messageOf(function(){ api.verify("S02",{decision:"Verified"}); })?"blocked":"ALLOWED";
+      api.signIn("staff-01");
+      return "read "+read+"; verify "+verify;
+    },
+    function(a){ return a==="read blocked; verify blocked"; });
+
+  attempt("TC09","A returned record is corrected and resubmitted: status is Pending and history keeps both steps",
+    "Pending with returned and resubmitted history",
+    function(){
+      api.verify("S06",{decision:"Returned",reason:"The grade document is unreadable. Upload a clearer scan."});
+      api.signIn("A06");
+      api.resubmit("S06",{academicYear:TERM_YEAR,semester:1,gwa:"2.00",enrolledUnits:"15",failed:"0",incomplete:"0",dropped:"0",evidenceRef:"GWA-A06-2026-1-clear.pdf"});
+      var status=getSub("S06").status;
+      var events=db.history.filter(function(h){return h.scholarId==="A06";}).map(function(h){return h.event;});
+      api.signIn("staff-01");
+      return status+" | returned "+(events.indexOf("Submission returned")>-1)+
+        " | resubmitted "+(events.indexOf("Submission resubmitted")>-1);
+    },
+    function(a){ return a==="Pending | returned true | resubmitted true"; });
+
+  attempt("TC10","Staff approve the compliant record, hold the deficient one, and a scholar cannot decide",
+    "Approved; approve-deficient blocked; Held; scholar blocked",
+    function(){
+      api.evaluate("S01"); api.evaluate("S02");
+      api.decide("S01","Approved");
+      var approved=getDec("S01").decision;
+      var blocked=messageOf(function(){ api.decide("S02","Approved"); })?"blocked":"ALLOWED";
+      api.decide("S02","Held");
+      var held=getDec("S02").decision;
+      api.signIn("A01");
+      var scholarBlocked=messageOf(function(){ api.decide("S01","Held"); })?"blocked":"ALLOWED";
+      api.signIn("staff-01");
+      return approved+"; approve-deficient "+blocked+"; "+held+"; scholar "+scholarBlocked;
+    },
+    function(a){ return a==="Approved; approve-deficient blocked; Held; scholar blocked"; });
+
+  return out;
+}
+//__NEXT__
+</script>
+
+<script id="app-ui">
+"use strict";
+/* ============================================================
+   UI layer. It only talks to the api object; it never touches the
+   data store directly, so hiding a button is never the only check.
+   ============================================================ */
+(function(){
+"use strict";
+
+var DB_KEY="smsms.db.v1";
+var SESSION_KEY="smsms.session.v1";
+var THEME_KEY="smsms.theme";
+
+function readStore(key){
+  try{ var raw=window.localStorage.getItem(key); return raw?JSON.parse(raw):null; }catch(e){ return null; }
+}
+function writeStore(key,value){
+  try{ window.localStorage.setItem(key,JSON.stringify(value)); }catch(e){}
+}
+
+var db=reconcileDemoUsers(readStore(DB_KEY)||seedDb());
+writeStore(DB_KEY,db);
+var holder={current:readStore(SESSION_KEY)||null};
+var api=makeApi(db,holder,function(){ writeStore(DB_KEY,db); writeStore(SESSION_KEY,holder.current); render(); });
+
+var ui={tab:"dashboard",year:TERM_YEAR,semester:String(TERM_SEM),
+  q:"",program:"",compliance:"",openId:null,editId:null,tests:null};
+
+var panel=document.getElementById("panel");
+var tabsEl=document.getElementById("tabs");
+var userSel=document.getElementById("userSel");
+var toastEl=document.getElementById("toast");
+var themeBtn=document.getElementById("themeBtn");
+var sessionInfo=document.getElementById("sessionInfo");
+var sessionName=document.getElementById("sessionName");
+var switchLabel=document.getElementById("switchLabel");
+var signOutBtn=document.getElementById("signOutBtn");
+var toastTimer=null;
+
+/* ---------- theme ---------- */
+function applyTheme(theme){
+  document.documentElement.setAttribute("data-theme",theme);
+  themeBtn.textContent=theme==="dark"?"Light mode":"Dark mode";
+  themeBtn.setAttribute("aria-pressed",theme==="dark"?"true":"false");
+  writeStore(THEME_KEY,theme);
+}
+var preferred=(window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light";
+applyTheme(readStore(THEME_KEY)||preferred);
+themeBtn.addEventListener("click",function(){
+  applyTheme(document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark");
+});
+
+/* ---------- messages ---------- */
+function toast(type,text){
+  toastEl.hidden=false;
+  toastEl.className="toast "+type;
+  toastEl.textContent=text;
+  if(toastTimer) clearTimeout(toastTimer);
+  toastTimer=setTimeout(function(){ toastEl.hidden=true; },7000);
+}
+function fail(e){
+  toast("error",e&&e.message?e.message:String(e));
+}
+
+/* ---------- render helpers ---------- */
+function badge(text,kind){ return '<span class="badge '+(kind||"")+'">'+esc(text)+'</span>'; }
+function statusBadge(st){
+  return st==="Verified"?badge("Verified","ok")
+    :st==="Returned"?badge("Returned","warn")
+    :st==="Pending"?badge("Pending verification","acc")
+    :badge(st);
+}
+function complianceBadge(c){
+  return c==="Compliant"?badge("Compliant","ok")
+    :c==="With Deficiency"?badge("With Deficiency","bad")
+    :badge("Not evaluated");
+}
+function decisionBadge(d){
+  return d==="Approved"?badge("Approved","ok")
+    :d==="Held"?badge("Held","warn")
+    :badge("Not decided");
+}
+function termBar(){
+  return '<div class="row" style="margin-bottom:.8rem">'+
+    '<div class="field"><label for="fYear">Academic year</label>'+
+    '<input type="text" id="fYear" data-bind="year" value="'+esc(ui.year)+'" placeholder="2026-2027"></div>'+
+    '<div class="field"><label for="fSem">Semester</label><select id="fSem" data-bind="semester">'+
+    '<option value="1"'+(ui.semester==="1"?" selected":"")+'>Semester 1</option>'+
+    '<option value="2"'+(ui.semester==="2"?" selected":"")+'>Semester 2</option>'+
+    '</select></div>'+
+    '<p class="muted small" style="margin:0">Showing '+esc("AY "+ui.year+" \u00b7 Semester "+ui.semester)+'</p>'+
+    '</div>';
+}
+function checksTable(checks){
+  var rows=checks.map(function(c){
+    return '<tr><td>'+esc(c.label)+'</td><td>'+esc(c.detail)+'</td><td>'+
+      (c.passed?'<span class="pass">Pass</span>':'<span class="fail">Fail</span>')+'</td></tr>';
+  }).join("");
+  return '<div class="table-wrap"><table class="checks"><caption class="sr-only">Policy checks for this record</caption>'+
+    '<thead><tr><th scope="col">Policy check</th><th scope="col">What the record shows</th>'+
+    '<th scope="col">Result</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+}
+function recordFacts(d){
+  var s=d.submission,p=d.program;
+  return '<div class="kv">'+
+    '<div><span>Scholar</span>'+esc(s.scholarId)+' \u00b7 '+esc(d.scholar.name)+'</div>'+
+    '<div><span>Policy record</span>'+esc(p.name)+' ('+esc(p.code)+')</div>'+
+    '<div><span>GWA</span>'+gwaText(s.gwa)+' (maximum '+gwaText(p.maxGwa)+')</div>'+
+    '<div><span>Enrolled units</span>'+s.enrolledUnits+' (minimum '+p.minUnits+')</div>'+
+    '<div><span>Failed / Incomplete / Dropped</span>'+s.failed+' / '+s.incomplete+' / '+s.dropped+
+      ' (limits '+p.maxFailed+' / '+p.maxIncomplete+' / '+p.maxDropped+')</div>'+
+    '<div><span>Evidence reference</span>'+esc(s.evidenceRef||"none recorded")+'</div>'+
+    '<div><span>Submitted</span>'+esc(manilaStamp(s.submittedAt))+'</div>'+
+    '<div><span>Deadline</span>'+esc(manilaStamp(p.deadline))+'</div>'+
+    '</div>';
+}
+function deficienciesBlock(evaluation){
+  if(!evaluation) return "";
+  if(!evaluation.deficiencies.length) return '<p class="okbox">No deficiencies. Every policy check passed.</p>';
+  return '<p class="small" style="margin-bottom:0"><strong>Deficiency reasons</strong></p><ul class="deflist">'+
+    evaluation.deficiencies.map(function(r){ return '<li>'+esc(r)+'</li>'; }).join("")+'</ul>';
+}
+function formErrorBox(){
+  return '<div class="err" id="formError" tabindex="-1" role="alert" hidden></div>';
+}
+function val(id){ var el=document.getElementById(id); return el?el.value:""; }
+function showFormError(msg){
+  var box=document.getElementById("formError");
+  if(box){ box.textContent=msg; box.hidden=false; box.focus(); }
+  else toast("error",msg);
+}
+function resetFormError(){
+  var box=document.getElementById("formError");
+  if(box){ box.textContent=""; box.hidden=true; }
+}
+/* ---------- chrome ---------- */
+var STAFF_TABS=[["dashboard","Dashboard"],["verify","Verification queue"],
+  ["evaluate","Compliance & renewal"],["register","Register scholar"],
+  ["history","History log"],["tests","Tests"]];
+var SCHOLAR_TABS=[["myrecords","My records"],["submit","Submit grades"],
+  ["history","History log"],["tests","Tests"]];
+
+function tabsFor(){ return api.getSession()&&(api.getSession().role==="staff")?STAFF_TABS:SCHOLAR_TABS; }
+
+function renderTabs(){
+  var tabs=tabsFor();
+  if(!tabs.some(function(t){ return t[0]===ui.tab; })) ui.tab=tabs[0][0];
+  tabsEl.innerHTML=tabs.map(function(t){
+    return '<button type="button" class="tab" role="tab" id="tab-'+esc(t[0])+'" data-act="tab" data-tab="'+esc(t[0])+
+      '" aria-selected="'+(ui.tab===t[0]?"true":"false")+'" aria-controls="panel">'+esc(t[1])+'</button>';
+  }).join("");
+}
+
+/* ---------- dashboard (staff) ---------- */
+function renderDashboard(){
+  var d=api.getDashboard({year:ui.year,semester:ui.semester,q:ui.q,program:ui.program,compliance:ui.compliance});
+  var programs=api.listPrograms();
+  var html='<section role="tabpanel" aria-labelledby="tab-dashboard" tabindex="-1">'+
+    '<h2>Dashboard \u2014 '+esc("AY "+d.year+" \u00b7 Semester "+d.semester)+'</h2>'+
+    '<p class="muted small">Counts cover the selected semester. Deficiency means the record was evaluated and at least one policy check failed, or it was submitted after the deadline.</p>'+
+    '<div class="grid">'+
+      '<div class="stat"><div class="n">'+d.assigned+'</div><div class="l">Assigned scholars</div></div>'+
+      '<div class="stat warn"><div class="n">'+d.pending+'</div><div class="l">Pending verification</div></div>'+
+      '<div class="stat ok"><div class="n">'+d.compliant+'</div><div class="l">Compliant</div></div>'+
+      '<div class="stat bad"><div class="n">'+d.deficient+'</div><div class="l">With deficiency</div></div>'+
+    '</div>'+
+    '<div class="card"><form id="filterForm" class="filters" novalidate>'+
+      '<div class="field"><label for="fq">Search by scholar ID or name</label>'+
+      '<input type="search" id="fq" data-bind="q" value="'+esc(ui.q)+'" placeholder="A01 or Elena"></div>'+
+      '<div class="field"><label for="fprog">Program</label><select id="fprog" data-bind="program">'+
+      '<option value="">All programs</option>'+
+      programs.map(function(p){ return '<option value="'+esc(p.code)+'"'+(ui.program===p.code?" selected":"")+'>'+esc(p.name)+'</option>'; }).join("")+
+      '</select></div>'+
+      '<div class="field"><label for="fcomp">Compliance</label><select id="fcomp" data-bind="compliance">'+
+      ['','Not evaluated','Compliant','With Deficiency'].map(function(c){
+        return '<option value="'+esc(c)+'"'+(ui.compliance===c?" selected":"")+'>'+(c===""?"All results":esc(c))+'</option>'; }).join("")+
+      '</select></div>'+
+      '<button type="button" class="btn-sm" data-act="clearFilters">Clear filters</button>'+
+    '</form>';
+
+  if(!d.rows.length){
+    html+='<p class="muted">No scholar matches these filters.</p></section>';
+    return html;
+  }
+  html+='<div class="table-wrap"><table><caption class="sr-only">Scholars for the selected semester</caption><thead><tr>'+
+    '<th scope="col">ID</th><th scope="col">Name</th><th scope="col">Program</th>'+
+    '<th scope="col">Submission</th><th scope="col">Compliance</th><th scope="col">Renewal</th>'+
+    '<th scope="col">Deficiency</th><th scope="col"><span class="sr-only">Actions</span></th></tr></thead><tbody>'+
+    d.rows.map(function(r){
+      var defCell=r.compliance==="With Deficiency"
+        ? '<span class="fail">'+esc(String(r.evaluation.deficiencies.length))+' reason(s)</span>'
+        : (r.compliance==="Compliant"?'<span class="pass">None</span>':'<span class="muted">Not evaluated yet</span>');
+      return '<tr><td class="mono">'+esc(r.scholar.id)+'</td><td>'+esc(r.scholar.name)+'</td>'+
+        '<td>'+esc(programName(programs,r.scholar.programCode))+'</td>'+
+        '<td>'+statusBadge(r.status)+'</td><td>'+complianceBadge(r.compliance)+'</td>'+
+        '<td>'+decisionBadge(r.decisionText)+'</td><td>'+defCell+'</td>'+
+        '<td>'+(r.submission?'<button type="button" class="btn-sm" data-act="open" data-id="'+esc(r.submission.id)+'" aria-expanded="'+(ui.openId===r.submission.id?"true":"false")+'">'+
+          (ui.openId===r.submission.id?"Close":"Open record")+'</button>':'<span class="muted small">No submission</span>')+'</td></tr>'+
+        (ui.openId===r.submission&&r.submission?'<tr><td colspan="8">'+recordDetail(api.getSubmission(r.submission.id),false)+'</td></tr>':'');
+    }).join("")+'</tbody></table></div></div></section>';
+  return html;
+}
+
+function recordDetail(d,staffMode){
+  var s=d.submission;
+  var html='<div class="open-detail"><h3>'+esc(s.scholarId+" \u00b7 "+d.scholar.name)+' \u2014 '+esc("AY "+s.academicYear+" Semester "+s.semester)+'</h3>'+
+    recordFacts(d);
+  if(s.status==="Returned"&&s.returnReason){
+    html+='<p class="warnbox"><strong>Returned for correction:</strong> '+esc(s.returnReason)+'</p>';
+  }
+  html+='<h4>Policy checks (read from the '+esc(d.program.name)+' policy record)</h4>'+checksTable(d.checks);
+  if(d.evaluation){
+    html+='<p style="margin-top:.7rem">Compliance result: '+complianceBadge(d.evaluation.result)+
+      ' <span class="muted small">evaluated '+esc(manilaStamp(d.evaluation.evaluatedAt))+'</span></p>';
+    html+=deficienciesBlock(d.evaluation);
+  }else{
+    var blocking=d.checks.filter(function(c){ return !c.passed&&/blocked/.test(c.detail); });
+    if(blocking.length) html+='<p class="warnbox">Evaluation is blocked until these are resolved: '+
+      esc(blocking.map(function(c){ return c.detail; }).join(" "))+'</p>';
+    else html+='<p class="muted small">Not evaluated yet. Staff can evaluate compliance on this record.</p>';
+  }
+  html+='<p style="margin-top:.7rem">Renewal decision: '+decisionBadge(d.decisionText)+
+    (d.decision?' <span class="muted small">recorded '+esc(manilaStamp(d.decision.decidedAt))+'</span>':'')+'</p>';
+  if(staffMode&&d.evaluation){
+    html+='<div class="actions">'+
+      '<button type="button" class="btn-primary" data-act="decide" data-id="'+esc(s.id)+'" data-decision="Approved"'+
+        (d.evaluation.result==="Compliant"?"":" disabled")+' title="'+
+        (d.evaluation.result==="Compliant"?"Record an Approved renewal":"Approval needs a Compliant result")+'">Record Approved</button>'+
+      '<button type="button" class="btn-warn" data-act="decide" data-id="'+esc(s.id)+'" data-decision="Held">Record Held</button>'+
+      '</div>';
+  }
+  return html+'</div>';
+}
+/* ---------- verification queue (staff) ---------- */
+function renderVerify(){
+  var list=api.listSubmissions().filter(function(d){
+    return d.submission.academicYear===ui.year&&d.submission.semester===Number(ui.semester);
+  });
+  var order={Pending:0,Returned:1,Verified:2};
+  list.sort(function(a,b){ return (order[a.submission.status]||9)-(order[b.submission.status]||9); });
+  var html='<section role="tabpanel" aria-labelledby="tab-verify" tabindex="-1">'+
+    '<h2>Verification queue</h2>'+
+    '<p class="muted small">Only records in <strong>Pending verification</strong> can be actioned. Returning a record always needs a reason; the scholar can then correct it and resubmit, which puts it back to Pending.</p>'+
+    termBar();
+  if(!list.length){ html+='<p class="muted">No submissions for this semester yet.</p></section>'; return html; }
+  html+='<div class="table-wrap"><table><caption class="sr-only">Submissions for verification</caption><thead><tr>'+
+    '<th scope="col">ID</th><th scope="col">Name</th><th scope="col">Program</th><th scope="col">Submitted</th>'+
+    '<th scope="col">Status</th><th scope="col">Evidence</th><th scope="col"><span class="sr-only">Actions</span></th>'+
+    '</tr></thead><tbody>'+
+    list.map(function(d){
+      var s=d.submission;
+      var canAct=s.status==="Pending";
+      return '<tr><td class="mono">'+esc(s.scholarId)+'</td><td>'+esc(d.scholar.name)+'</td>'+
+        '<td>'+esc(d.program.name)+'</td><td class="small">'+esc(manilaStamp(s.submittedAt))+'</td>'+
+        '<td>'+statusBadge(s.status)+'</td><td class="mono small">'+esc(s.evidenceRef||"\u2014")+'</td>'+
+        '<td><button type="button" class="btn-sm" data-act="open" data-id="'+esc(s.id)+'" aria-expanded="'+(ui.openId===s.id?"true":"false")+'">'+
+          (ui.openId===s.id?"Close":"Review")+'</button>'+
+          (canAct?'':' <span class="sr-only">Actioning is only available for pending records</span>')+'</td></tr>'+
+        (ui.openId===s.id?'<tr><td colspan="7">'+verifyPanel(d,canAct)+'</td></tr>':'');
+    }).join("")+'</tbody></table></div></section>';
+  return html;
+}
+
+function verifyPanel(d,canAct){
+  var s=d.submission;
+  var html=recordDetail(d,false);
+  if(!canAct){
+    html+='<p class="muted small">This record is '+esc(s.status)+
+      ', so the verification buttons are unavailable. That restriction is enforced by the API, not only by this interface.</p>';
+    return html;
+  }
+  html+='<form id="verifyForm" class="open-detail" data-id="'+esc(s.id)+'" novalidate>'+
+    '<h4>Verification decision</h4>'+formErrorBox()+
+    '<div class="actions">'+
+    '<button type="submit" class="btn-ok" data-decision="Verified">Mark Verified</button>'+
+    '<button type="button" class="btn-bad" data-act="returnOpen" data-id="'+esc(s.id)+'">Return for correction\u2026</button>'+
+    '</div>'+
+    '<div id="returnBox" hidden style="margin-top:.7rem">'+
+      '<div class="field"><label for="returnReason">Reason for return (required)</label>'+
+      '<textarea id="returnReason" placeholder="Explain what the scholar must fix, for example: the grade document is unreadable."></textarea></div>'+
+      '<div class="actions"><button type="submit" class="btn-bad" data-decision="Returned">Confirm return</button>'+
+      '<button type="button" data-act="returnCancel">Cancel</button></div>'+
+    '</div>'+
+    '</form>';
+  return html;
+}
+
+/* ---------- compliance and renewal (staff) ---------- */
+function renderEvaluate(){
+  var list=api.listSubmissions().filter(function(d){
+    return d.submission.academicYear===ui.year&&d.submission.semester===Number(ui.semester);
+  });
+  var html='<section role="tabpanel" aria-labelledby="tab-evaluate" tabindex="-1">'+
+    '<h2>Compliance evaluation and renewal decision</h2>'+
+    '<p class="muted small">Only <strong>verified</strong> records can be evaluated. Every policy check is listed with its reason. Approval is only possible when the result is Compliant. Submission status, compliance result and renewal decision stay three separate fields.</p>'+
+    termBar();
+  if(!list.length){ html+='<p class="muted">No submissions for this semester yet.</p></section>'; return html; }
+  html+='<div class="table-wrap"><table><caption class="sr-only">Records available for evaluation</caption><thead><tr>'+
+    '<th scope="col">ID</th><th scope="col">Name</th><th scope="col">Program</th>'+
+    '<th scope="col">Status</th><th scope="col">Compliance</th><th scope="col">Renewal</th>'+
+    '<th scope="col"><span class="sr-only">Actions</span></th></tr></thead><tbody>'+
+    list.map(function(d){
+      var s=d.submission;
+      return '<tr><td class="mono">'+esc(s.scholarId)+'</td><td>'+esc(d.scholar.name)+'</td>'+
+        '<td>'+esc(d.program.name)+'</td><td>'+statusBadge(s.status)+'</td>'+
+        '<td>'+complianceBadge(d.compliance)+'</td><td>'+decisionBadge(d.decisionText)+'</td>'+
+        '<td><button type="button" class="btn-sm" data-act="open" data-id="'+esc(s.id)+'" aria-expanded="'+(ui.openId===s.id?"true":"false")+'">'+
+          (ui.openId===s.id?"Close":"Evaluate")+'</button></td></tr>'+
+        (ui.openId===s.id?'<tr><td colspan="7">'+evaluatePanel(d)+'</td></tr>':'');
+    }).join("")+'</tbody></table></div></section>';
+  return html;
+}
+
+function evaluatePanel(d){
+  var s=d.submission;
+  var html=recordDetail(d,true);
+  html+='<div class="actions"><button type="button" class="btn-primary" data-act="evaluate" data-id="'+esc(s.id)+'">'+
+    (d.evaluation?"Re-run compliance evaluation":"Run compliance evaluation")+'</button></div>';
+  if(s.status!=="Verified"){
+    html+='<p class="warnbox">This record is '+esc(s.status)+
+      '. The API refuses to evaluate or decide on it until it is verified.</p>';
+  }
+  return html;
+}
+
+/* ---------- register scholar (staff) ---------- */
+function renderRegister(){
+  var programs=api.listPrograms();
+  var scholars=api.listScholars();
+  return '<section role="tabpanel" aria-labelledby="tab-register" tabindex="-1">'+
+    '<h2>Register a scholar</h2>'+
+    '<p class="muted small">Registration assigns exactly one stored policy record. Evaluation later reads every threshold from that policy, never from a hard-coded constant.</p>'+
+    '<div class="card"><form id="registerForm" novalidate>'+formErrorBox()+
+    '<div class="row">'+
+      '<div class="field"><label for="rid">Scholar ID</label><input type="text" id="rid" placeholder="A13" autocomplete="off"></div>'+
+      '<div class="field"><label for="rname">Full name</label><input type="text" id="rname" placeholder="Juan Dela Cruz" autocomplete="off"></div>'+
+      '<div class="field"><label for="rprog">Scholarship program</label><select id="rprog">'+
+        programs.map(function(p){ return '<option value="'+esc(p.code)+'">'+esc(p.name)+'</option>'; }).join("")+
+      '</select></div>'+
+      '<button type="submit" class="btn-primary">Register scholar</button>'+
+    '</div></form>'+
+    '<h3 style="margin-top:1.2rem">Stored policy records</h3>'+
+    '<div class="table-wrap"><table><caption class="sr-only">Policy records</caption><thead><tr>'+
+    '<th scope="col">Code</th><th scope="col">Name</th><th scope="col">Max GWA</th><th scope="col">Min units</th>'+
+    '<th scope="col">Failed</th><th scope="col">Incomplete</th><th scope="col">Dropped</th>'+
+    '<th scope="col">Evidence</th><th scope="col">Deadline (Asia/Manila)</th></tr></thead><tbody>'+
+    programs.map(function(p){
+      return '<tr><td class="mono">'+esc(p.code)+'</td><td>'+esc(p.name)+'</td>'+
+        '<td>'+gwaText(p.maxGwa)+'</td><td>'+p.minUnits+'</td><td>'+p.maxFailed+'</td>'+
+        '<td>'+p.maxIncomplete+'</td><td>'+p.maxDropped+'</td>'+
+        '<td>'+(p.evidenceRequired?"Required":"Optional")+'</td>'+
+        '<td class="small">'+esc(manilaStamp(p.deadline))+'</td></tr>';
+    }).join("")+'</tbody></table></div>'+
+    '<h3 style="margin-top:1.2rem">Registered scholars ('+scholars.length+')</h3>'+
+    '<div class="table-wrap"><table><caption class="sr-only">Registered scholars</caption><thead><tr>'+
+    '<th scope="col">ID</th><th scope="col">Name</th><th scope="col">Program</th>'+
+    '<th scope="col">Registered</th></tr></thead><tbody>'+
+    scholars.map(function(s){
+      return '<tr><td class="mono">'+esc(s.id)+'</td><td>'+esc(s.name)+'</td>'+
+        '<td>'+esc(programName(programs,s.programCode))+'</td>'+
+        '<td class="small">'+esc(manilaStamp(s.registeredAt))+'</td></tr>';
+    }).join("")+'</tbody></table></div></div></section>';
+}
+
+/* ---------- history log ---------- */
+function renderHistory(){
+  var rows=api.listHistory();
+  var staff=api.getSession().role==="staff";
+  return '<section role="tabpanel" aria-labelledby="tab-history" tabindex="-1">'+
+    '<h2>History log</h2>'+
+    '<p class="muted small">'+(staff
+      ?"Every registration, submission, verification, evaluation and renewal decision, newest first."
+      :"Your own activity only. The API filters this list by your scholar ID.")+'</p>'+
+    (rows.length?'<div class="table-wrap"><table><caption class="sr-only">History log</caption><thead><tr>'+
+    '<th scope="col">Timestamp</th><th scope="col">Actor</th><th scope="col">Role</th>'+
+    '<th scope="col">Event</th><th scope="col">Notes</th>'+(staff?'<th scope="col">Record</th>':'')+
+    '</tr></thead><tbody>'+
+    rows.map(function(h){
+      return '<tr><td class="small">'+esc(manilaStamp(h.at))+'</td><td>'+esc(h.actor)+'</td>'+
+        '<td>'+esc(h.actorRole)+'</td><td>'+esc(h.event)+'</td>'+
+        '<td class="small">'+esc(h.notes||"\u2014")+'</td>'+
+        (staff?'<td class="mono small">'+esc((h.submissionId?h.submissionId+" / ":"")+h.scholarId)+'</td>':'')+
+        '</tr>';
+    }).join("")+'</tbody></table></div>'
+    :'<p class="muted">No history entries yet.</p>')+
+    '</section>';
+}
+/* ---------- scholar: my records ---------- */
+function renderMyRecords(){
+  var me=api.getSession();
+  var all=api.listSubmissions();
+  var scholar=api.getMyScholar();
+  var programs=api.listPrograms();
+  var program=programs.filter(function(p){ return scholar&&p.code===scholar.programCode; })[0];
+  var html='<section role="tabpanel" aria-labelledby="tab-myrecords" tabindex="-1">'+
+    '<h2>My scholarship records</h2>'+
+    '<p class="muted small">Signed in as '+esc(me.name)+' ('+esc(me.id)+'). You can only read your own records; the API enforces that.</p>';
+  if(scholar&&program){
+    html+='<div class="card"><h3>My policy</h3><div class="kv">'+
+      '<div><span>Program</span>'+esc(program.name)+'</div>'+
+      '<div><span>Maximum GWA</span>'+gwaText(program.maxGwa)+'</div>'+
+      '<div><span>Minimum units</span>'+program.minUnits+'</div>'+
+      '<div><span>Failed / Incomplete / Dropped</span>'+program.maxFailed+' / '+program.maxIncomplete+' / '+program.maxDropped+'</div>'+
+      '<div><span>Evidence</span>'+(program.evidenceRequired?"Required":"Optional")+'</div>'+
+      '<div><span>Deadline</span>'+esc(manilaStamp(program.deadline))+'</div>'+
+      '</div></div>';
+  }
+  if(!all.length){
+    html+='<p class="muted">You have no submitted records yet. Use <strong>Submit grades</strong> to send your semester summary.</p></section>';
+    return html;
+  }
+  html+='<div class="table-wrap"><table><caption class="sr-only">Your submissions</caption><thead><tr>'+
+    '<th scope="col">Academic year</th><th scope="col">Semester</th><th scope="col">GWA</th><th scope="col">Units</th>'+
+    '<th scope="col">Submission</th><th scope="col">Compliance</th><th scope="col">Renewal</th>'+
+    '<th scope="col"><span class="sr-only">Actions</span></th></tr></thead><tbody>'+
+    all.map(function(d){
+      var s=d.submission;
+      return '<tr><td>'+esc(s.academicYear)+'</td><td>'+s.semester+'</td><td>'+gwaText(s.gwa)+'</td>'+
+        '<td>'+s.enrolledUnits+'</td><td>'+statusBadge(s.status)+'</td>'+
+        '<td>'+complianceBadge(d.compliance)+'</td><td>'+decisionBadge(d.decisionText)+'</td>'+
+        '<td>'+(s.status==="Returned"
+          ?'<button type="button" class="btn-sm btn-primary" data-act="edit" data-id="'+esc(s.id)+'">Correct and resubmit</button>'
+          :'<button type="button" class="btn-sm" data-act="open" data-id="'+esc(s.id)+'" aria-expanded="'+(ui.openId===s.id?"true":"false")+'">'+
+            (ui.openId===s.id?"Close":"View")+'</button>')+'</td></tr>'+
+        (ui.openId===s.id?'<tr><td colspan="8">'+recordDetail(d,false)+'</td></tr>':'');
+    }).join("")+'</tbody></table></div></section>';
+  return html;
+}
+
+/* ---------- scholar: submit grades ---------- */
+function renderSubmit(){
+  var editing=ui.editId?api.getSubmission(ui.editId):null;
+  var me=api.getSession();
+  var defaults={academicYear:TERM_YEAR,semester:String(TERM_SEM),gwa:"",enrolledUnits:"",failed:"",incomplete:"",dropped:"",evidenceRef:""};
+  var v=defaults;
+  if(editing){ var s=editing.submission;
+    v={academicYear:s.academicYear,semester:String(s.semester),gwa:gwaText(s.gwa),
+       enrolledUnits:String(s.enrolledUnits),failed:String(s.failed),incomplete:String(s.incomplete),
+       dropped:String(s.dropped),evidenceRef:s.evidenceRef}; }
+  var html='<section role="tabpanel" aria-labelledby="tab-submit" tabindex="-1">'+
+    '<h2>'+(editing?"Correct and resubmit grades":"Submit semester grades")+'</h2>'+
+    '<p class="muted small">GWA uses the Registrar scale where 1.00 is best and 5.00 is failing. Your submission stays Pending until scholarship staff verify it. This system records your evidence reference; it never copies or changes official grades.</p>';
+  if(editing&&editing.submission.returnReason){
+    html+='<p class="warnbox"><strong>Returned for correction:</strong> '+esc(editing.submission.returnReason)+'</p>';
+  }
+  html+='<div class="card"><form id="submitForm" novalidate>'+formErrorBox()+
+    '<div class="row">'+
+      '<div class="field"><label for="sYear">Academic year</label><input type="text" id="sYear" value="'+esc(v.academicYear)+'" placeholder="2026-2027"></div>'+
+      '<div class="field"><label for="sSem">Semester</label><select id="sSem">'+
+        '<option value="1"'+(v.semester==="1"?" selected":"")+'>Semester 1</option>'+
+        '<option value="2"'+(v.semester==="2"?" selected":"")+'>Semester 2</option></select></div>'+
+      '<div class="field"><label for="sGwa">GWA (1.00\u20135.00)</label><input type="text" inputmode="decimal" id="sGwa" value="'+esc(v.gwa)+'" placeholder="1.75"></div>'+
+      '<div class="field"><label for="sUnits">Enrolled units</label><input type="text" inputmode="numeric" id="sUnits" value="'+esc(v.enrolledUnits)+'" placeholder="18"></div>'+
+      '<div class="field"><label for="sFailed">Failed grades</label><input type="text" inputmode="numeric" id="sFailed" value="'+esc(v.failed)+'" placeholder="0"></div>'+
+      '<div class="field"><label for="sIncomplete">Incomplete grades</label><input type="text" inputmode="numeric" id="sIncomplete" value="'+esc(v.incomplete)+'" placeholder="0"></div>'+
+      '<div class="field"><label for="sDropped">Dropped grades</label><input type="text" inputmode="numeric" id="sDropped" value="'+esc(v.dropped)+'" placeholder="0"></div>'+
+    '</div>'+
+    '<div class="field" style="margin-top:.7rem"><label for="sEvidence">Grade-document reference (evidence)</label>'+
+    '<input type="text" id="sEvidence" value="'+esc(v.evidenceRef)+'" placeholder="GWA-'+esc(me.id)+'-2026-1.pdf">'+
+    '<span class="muted small">File name or Registrar document ID. Keep the original; staff will verify against it.</span></div>'+
+    '<div class="actions">'+
+      '<button type="submit" class="btn-primary">'+(editing?"Correct and resubmit":"Submit grades")+'</button>'+
+      (editing?'<button type="button" data-act="cancelEdit">Cancel correction</button>':'')+
+    '</div>'+
+    '<p class="muted small">Submitted timestamps are recorded in Asia/Manila. The deadline for this term is '+esc(manilaStamp(DEADLINE_ISO))+' (exactly on the deadline is still on time).</p>'+
+    '</form></div></section>';
+  return html;
+}
+
+/* ---------- tests ---------- */
+function renderTests(){
+  var results=ui.tests;
+  var html='<section role="tabpanel" aria-labelledby="tab-tests" tabindex="-1">'+
+    '<h2>Test runner</h2>'+
+    '<p class="muted small">Each run executes against a fresh copy of the seed data, so your working records are never changed by the tests.</p>'+
+    '<div class="card"><button type="button" class="btn-primary" data-act="runTests">Run all 10 test cases</button>';
+  if(results){
+    var passed=results.filter(function(r){ return r.pass; }).length;
+    html+='<p style="margin-top:.9rem">'+passed+' of '+results.length+' passed. '+
+      (passed===results.length?'<span class="pass">All checks green.</span>':'<span class="fail">Review the failures below.</span>')+'</p>'+
+      '<div class="table-wrap"><table><caption class="sr-only">Test results</caption><thead><tr>'+
+      '<th scope="col">TC</th><th scope="col">What is tested</th><th scope="col">Expected</th>'+
+      '<th scope="col">Actual</th><th scope="col">Result</th></tr></thead><tbody>'+
+      results.map(function(r){
+        return '<tr><td class="mono">'+esc(r.id)+'</td><td class="small">'+esc(r.desc)+'</td>'+
+          '<td class="small">'+esc(r.expect)+'</td><td class="small mono">'+esc(r.actual)+'</td>'+
+          '<td>'+(r.pass?'<span class="pass">Pass</span>':'<span class="fail">Fail</span>')+'</td></tr>';
+      }).join("")+'</tbody></table></div>';
+  }
+  html+='</div></section>';
+  return html;
+}
+
+/* ---------- master render ---------- */
+function render(){
+  var session=api.getSession();
+  renderSessionBar(session);
+  if(!session){
+    tabsEl.innerHTML="";
+    panel.innerHTML=renderLogin();
+    return;
+  }
+  renderTabs();
+  var views={dashboard:renderDashboard,verify:renderVerify,evaluate:renderEvaluate,
+    register:registerGuard,history:renderHistory,tests:renderTests,
+    myrecords:renderMyRecords,submit:renderSubmit};
+  try{
+    panel.innerHTML=(views[ui.tab]||renderDashboard)();
+  }catch(e){
+    panel.innerHTML='<section class="card"><h2>Access refused</h2><div class="err">'+esc(e.message)+'</div>'+
+      '<p class="muted">The API refused this request. Nothing was hidden in the interface only.</p></section>';
+  }
+}
+function registerGuard(){ return renderRegister(); }
+
+/* ---------- login form ---------- */
+function renderLogin(){
+  var programs=api.listPrograms();
+  var users=api.listUsers();
+  return '<div class="login-wrap"><section class="login-card" role="region" aria-labelledby="loginTitle">'+
+    '<h2 id="loginTitle">Sign in</h2>'+
+    '<p class="muted small">Student Scholarship Monitoring &amp; Academic Compliance System. Synthetic demo accounts only.</p>'+
+    '<form id="loginForm" novalidate>'+formErrorBox()+
+      '<div class="login-field"><label for="liUser">Username</label>'+
+      '<input type="text" id="liUser" name="username" autocomplete="username" placeholder="A01 or staff-01" autofocus></div>'+
+      '<div class="login-field"><label for="liPass">Password</label>'+
+      '<div class="pw-row"><input type="password" id="liPass" name="password" autocomplete="current-password" placeholder="Enter password">'+
+      '<button type="button" class="btn-sm" data-act="togglePw" id="pwToggle" aria-label="Show password">Show</button></div></div>'+
+      '<button type="submit" class="btn-primary login-submit">Sign in</button>'+
+    '</form>'+
+    '<div class="creds"><p class="muted small" style="margin:0 0 .4rem"><strong>Demo credentials</strong> \u2014 click a username to fill the form.</p>'+
+    '<div class="table-wrap"><table><thead><tr><th scope="col">Role</th><th scope="col">Username</th>'+
+    '<th scope="col">Password</th><th scope="col"><span class="sr-only">Use</span></th></tr></thead><tbody>'+
+    '<tr><td>Scholarship Staff</td><td class="mono">staff-01</td><td class="mono">staff123</td>'+
+    '<td><button type="button" class="fill" data-act="fillLogin" data-u="staff-01" data-p="staff123">use</button></td></tr>'+
+    users.filter(function(u){return u.role==="scholar";}).slice(0,3).map(function(u){
+      return '<tr><td>Scholar</td><td class="mono">'+esc(u.id)+'</td><td class="mono">scholar123</td>'+
+        '<td><button type="button" class="fill" data-act="fillLogin" data-u="'+esc(u.id)+'" data-p="scholar123">use</button></td></tr>';
+    }).join("")+
+    '<tr><td class="muted" colspan="4">Other scholars A01\u2013A12 use the password <span class="mono">scholar123</span>.</td></tr>'+
+    '</tbody></table></div>'+
+    '<p class="muted small" style="margin-top:.6rem">Policies available: '+
+      programs.map(function(p){return esc(p.name);}).join(", ")+
+      '. This login is a demo shim; the production build uses Supabase Auth.</p>'+
+    '</div>'+
+    '</section></div>';
+}
+
+function renderSessionBar(session){
+  if(session){
+    sessionInfo.hidden=false; switchLabel.hidden=false; userSel.hidden=false; signOutBtn.hidden=false;
+    sessionName.textContent=session.label;
+    userSel.innerHTML=api.listUsers().map(function(u){
+      return '<option value="'+esc(u.id)+'"'+(session.id===u.id?" selected":"")+'>'+esc(u.label)+'</option>';
+    }).join("");
+  }else{
+    sessionInfo.hidden=true; switchLabel.hidden=true; userSel.hidden=true; signOutBtn.hidden=true;
+    userSel.innerHTML="";
+  }
+}
+
+/* ---------- events ---------- */
+document.addEventListener("click",function(ev){
+  var t=ev.target.closest?ev.target.closest("[data-act]"):null;
+  if(!t) return;
+  var act=t.getAttribute("data-act");
+  var id=t.getAttribute("data-id");
+  try{
+    if(act==="tab"){ ui.tab=t.getAttribute("data-tab"); ui.openId=null; ui.editId=null; render(); focusPanel(); return; }
+    if(act==="open"){ ui.openId=(ui.openId===id?null:id); render(); return; }
+    if(act==="clearFilters"){ ui.q=""; ui.program=""; ui.compliance=""; render(); return; }
+    if(act==="evaluate"){ api.evaluate(id); toast("ok","Compliance evaluated. The result is stored separately from the submission status and the renewal decision."); return; }
+    if(act==="decide"){ api.decide(id,t.getAttribute("data-decision")); toast("ok","Renewal decision recorded."); return; }
+    if(act==="returnOpen"){
+      var box=document.getElementById("returnBox");
+      if(box){ box.hidden=false; var r=document.getElementById("returnReason"); if(r) r.focus(); }
+      return;
+    }
+    if(act==="returnCancel"){
+      var b2=document.getElementById("returnBox");
+      if(b2){ b2.hidden=true; }
+      return;
+    }
+    if(act==="edit"){ ui.editId=id; ui.tab="submit"; render(); focusPanel(); return; }
+    if(act==="cancelEdit"){ ui.editId=null; ui.tab="myrecords"; render(); return; }
+    if(act==="fillLogin"){
+      var uu=document.getElementById("liUser"), pp=document.getElementById("liPass");
+      if(uu) uu.value=t.getAttribute("data-u");
+      if(pp) pp.value=t.getAttribute("data-p");
+      if(uu) uu.focus();
+      return;
+    }
+    if(act==="togglePw"){
+      var pw=document.getElementById("liPass");
+      if(pw){ var showing=pw.type==="password"; pw.type=showing?"text":"password"; t.textContent=showing?"Hide":"Show"; t.setAttribute("aria-label",showing?"Hide password":"Show password"); }
+      return;
+    }
+    if(act==="runTests"){ ui.tests=api.runTests(); render();
+      var n=ui.tests.filter(function(r){return r.pass;}).length;
+      toast(n===ui.tests.length?"ok":"error",n+" of "+ui.tests.length+" test cases passed."); return; }
+  }catch(e){ fail(e); }
+});
+
+document.addEventListener("submit",function(ev){
+  var form=ev.target;
+  ev.preventDefault();
+  resetFormError();
+  try{
+    if(form.id==="filterForm") return;
+    if(form.id==="loginForm"){
+      var user=api.login(val("liUser"),val("liPass"));
+      ui.openId=null; ui.editId=null; ui.tests=null;
+      ui.tab=user.role==="staff"?"dashboard":"myrecords";
+      toast("ok","Signed in as "+user.label+".");
+      render(); focusPanel(); return;
+    }
+    if(form.id==="submitForm"){
+      var payload={academicYear:val("sYear"),semester:val("sSem"),gwa:val("sGwa"),
+        enrolledUnits:val("sUnits"),failed:val("sFailed"),incomplete:val("sIncomplete"),
+        dropped:val("sDropped"),evidenceRef:val("sEvidence")};
+      if(ui.editId){ api.resubmit(ui.editId,payload); ui.editId=null; ui.tab="myrecords"; }
+      else api.submitGrades(payload);
+      toast("ok","Submitted. Your record is now Pending verification.");
+      render(); focusPanel(); return;
+    }
+    if(form.id==="verifyForm"){
+      var choice=tDecision;
+      tDecision=null;
+      if(!choice){ toast("error","Choose Verified or Returned."); return; }
+      api.verify(form.getAttribute("data-id"),{decision:choice,reason:val("returnReason")});
+      ui.openId=null;
+      toast("ok",choice==="Verified"?"Record verified. It can now be evaluated for compliance."
+        :"Record returned. The scholar can correct it and resubmit; it will be Pending again.");
+      render(); return;
+    }
+    if(form.id==="registerForm"){
+      var scholar=api.registerScholar({id:val("rid"),name:val("rname"),programCode:val("rprog")});
+      toast("ok","Registered "+scholar.name+" ("+scholar.id+").");
+      render(); return;
+    }
+  }catch(e){ fail(e); showFormError(e.message); }
+});
+
+/* remember which verification button was activated (works by mouse or keyboard) */
+var tDecision=null;
+document.addEventListener("click",function(ev){
+  var b=ev.target.closest?ev.target.closest('#verifyForm button[data-decision]'):null;
+  if(b) tDecision=b.getAttribute("data-decision");
+},true);
+
+document.addEventListener("keydown",function(ev){
+  if(ev.key!=="Enter"&&ev.key!==" ") return;
+  var b=ev.target.closest?ev.target.closest('#verifyForm button[data-decision]'):null;
+  if(b&&ev.target===b) tDecision=b.getAttribute("data-decision");
+},true);
+
+document.addEventListener("input",function(ev){
+  var el=ev.target;
+  var bind=el.getAttribute&&el.getAttribute("data-bind");
+  if(!bind) return;
+  if(el.tagName==="SELECT"){ ui[bind]=el.value; render(); }
+  else{
+    var pos=el.selectionStart;
+    ui[bind]=el.value;
+    render();
+    var again=document.getElementById(el.id);
+    if(again){ again.focus(); try{ again.setSelectionRange(pos,pos); }catch(e){} }
+  }
+});
+
+userSel.addEventListener("change",function(){
+  try{
+    api.signIn(userSel.value);
+    ui.openId=null; ui.editId=null; ui.tests=null;
+    var s=api.getSession();
+    ui.tab=s.role==="staff"?"dashboard":"myrecords";
+    toast("ok","Signed in as "+s.label+".");
+  }catch(e){ fail(e); }
+});
+
+signOutBtn.addEventListener("click",function(){
+  api.signOut();
+  ui.openId=null; ui.editId=null; ui.tests=null;
+  toast("ok","Signed out.");
+  render();
+});
+
+function focusPanel(){ if(panel) panel.focus(); }
+
+if(!holder.current) ui.tab="dashboard";
+render();
+})();
+//__NEXT2__
+</script>
+</body>
+</html>
