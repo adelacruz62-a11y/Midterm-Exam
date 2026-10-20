@@ -149,8 +149,6 @@ footer{padding:1rem 1.2rem;color:var(--muted);font-size:.8rem;text-align:center;
   </div>
   <div class="session">
     <span class="muted small" id="sessionInfo" hidden>Signed in as <strong id="sessionName"></strong></span>
-    <span class="muted small" id="switchLabel" hidden>Switch account</span>
-    <select id="userSel" aria-label="Demo account selector" hidden></select>
     <button id="signOutBtn" type="button" hidden>Sign out</button>
     <button id="themeBtn" type="button" aria-pressed="false">Dark mode</button>
   </div>
@@ -878,12 +876,10 @@ var ui={tab:"dashboard",year:TERM_YEAR,semester:String(TERM_SEM),
 
 var panel=document.getElementById("panel");
 var tabsEl=document.getElementById("tabs");
-var userSel=document.getElementById("userSel");
 var toastEl=document.getElementById("toast");
 var themeBtn=document.getElementById("themeBtn");
 var sessionInfo=document.getElementById("sessionInfo");
 var sessionName=document.getElementById("sessionName");
-var switchLabel=document.getElementById("switchLabel");
 var signOutBtn=document.getElementById("signOutBtn");
 var toastTimer=null;
 
@@ -1398,14 +1394,10 @@ function renderLogin(){
 
 function renderSessionBar(session){
   if(session){
-    sessionInfo.hidden=false; switchLabel.hidden=false; userSel.hidden=false; signOutBtn.hidden=false;
+    sessionInfo.hidden=false; signOutBtn.hidden=false;
     sessionName.textContent=session.label;
-    userSel.innerHTML=api.listUsers().map(function(u){
-      return '<option value="'+esc(u.id)+'"'+(session.id===u.id?" selected":"")+'>'+esc(u.label)+'</option>';
-    }).join("");
   }else{
-    sessionInfo.hidden=true; switchLabel.hidden=true; userSel.hidden=true; signOutBtn.hidden=true;
-    userSel.innerHTML="";
+    sessionInfo.hidden=true; signOutBtn.hidden=true;
   }
 }
 
@@ -1516,16 +1508,6 @@ document.addEventListener("input",function(ev){
     var again=document.getElementById(el.id);
     if(again){ again.focus(); try{ again.setSelectionRange(pos,pos); }catch(e){} }
   }
-});
-
-userSel.addEventListener("change",function(){
-  try{
-    api.signIn(userSel.value);
-    ui.openId=null; ui.editId=null; ui.tests=null;
-    var s=api.getSession();
-    ui.tab=s.role==="staff"?"dashboard":"myrecords";
-    toast("ok","Signed in as "+s.label+".");
-  }catch(e){ fail(e); }
 });
 
 signOutBtn.addEventListener("click",function(){
